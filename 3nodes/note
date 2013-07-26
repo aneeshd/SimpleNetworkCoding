@@ -1,0 +1,10 @@
+Assumption: 
+Both source data contain equal number of bits.
+Encoding is done at intermediate node i.e. C
+Decoding are performed at both the source nodes A & B.
+
+Practical Example:
+Source A sends the message "Network Coding is complex and hard."
+Source B sends the message "Performing experiments in Interlab."
+Node C is the intermediate node which performs XOR operations betweens bits from source A and source B. Node C broadcast the coded message.
+Source A decodes the message from source B as and vice versa.
