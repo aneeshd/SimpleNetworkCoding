@@ -1,35 +1,75 @@
-#import random
 import numpy
-#from decimal import *
+from encoder import encode, code1, linearCode, xorCode, SelfTest
+
+DEBUG=False
 
 #Decodes using Gauss elimination method
-def DecodeAtReceiver(listOfVector):
+def GaussEliminationLinear(listOfVector):
 	a = numpy.array(listOfVector)
 	rows=a.shape[0]
 	columns=a.shape[1]
-	#print a
+	if DEBUG: print '---------------'
+	if DEBUG: print a
 	
 	answer = numpy.zeros(rows)
 	
 	# Eliminating variables
+	if DEBUG: print '- eliminate'
 	for i in numpy.arange(0,columns): #variable to eliminate
-	   for j in numpy.arange(i+1,rows): #rows to eliminate said variable from
-	     tmp=a[i]*(-a[j][i]/a[i][i]) #multiply row
-	     a[j]=tmp+a[j] #add
-
+		for j in numpy.arange(i+1,rows): #rows to eliminate said variable from
+			tmp=a[i]*(-a[j][i]/a[i][i]) #multiply row
+			a[j]=tmp+a[j] #add
+			if DEBUG: print a, i, j, tmp
+	
 	# Back substitute
+	if DEBUG: print '- backsub'
 	for i in (numpy.arange(rows).shape[0]-numpy.arange(rows)-1):
-	   if(i<columns-2):
-	     a[i][columns-1]=a[i][columns-1]-(sum(a[i])-a[i][i]-a[i][columns-1])
-	 
-	   #calculate ith variable
-	   answer[i]=a[i][columns-1]/(a[i][i])
-	   #substitute variable by
-	   #multiply rows starting with i-1, column i by answer[i]
-	   for j in numpy.arange(0,i):
-	     a[j][i]=a[j][i]*answer[i]
+		answer[i]=a[i][columns-1]/(a[i][i])
+		if DEBUG: print '***', i, '=', answer[i]
+		for j in numpy.arange(0,i):
+			a[j][columns-1]-=a[j][i]*answer[i]
+			a[j][i]=0
+			if DEBUG: print a, i, j
 
+	if DEBUG: print a, answer
 	return answer
+
+def GaussEliminationXor(listOfVector):
+	l = [ [ int(x) for x in y] for y in listOfVector ]
+	a = numpy.array(l)
+	rows=a.shape[0]
+	columns=a.shape[1]
+	if DEBUG: print '---------------'
+	if DEBUG: print a
+	
+	answer = [0]*rows
+	
+	# Eliminating variables
+	if DEBUG: print '- eliminate'
+	for i in numpy.arange(0,columns): #variable to eliminate
+		for j in numpy.arange(i+1,rows): #rows to eliminate said variable from
+			if a[j][i]==0: continue
+			tmp=a[i]
+			a[j]=tmp ^ a[j] #add
+			if DEBUG: print a, i, j, tmp
+	
+	# Back substitute
+	if DEBUG: print '- backsub'
+	for i in (numpy.arange(rows).shape[0]-numpy.arange(rows)-1):
+		answer[i]=a[i][columns-1] #/(a[i][i])
+		if DEBUG: print '***', i, '=', answer[i]
+		for j in numpy.arange(0,i):
+			a[j][columns-1] ^= a[j][i]*answer[i]
+			a[j][i]=0
+			if DEBUG: print a, i, j
+
+	if DEBUG: print a, answer
+	return answer
+
+if code1==linearCode:
+	decode1=GaussEliminationLinear
+else:
+	decode1=GaussEliminationXor
 
 # Decoding Part
 #################################################################
@@ -38,15 +78,13 @@ def decode(encoded):
 	numAns = len(listt[0])
 	listAns =[]
 	for listOfVector in listt:
-		y=[int(x) for x in DecodeAtReceiver(listOfVector)]
+		y=[int(x) for x in decode1(listOfVector)]
 		listAns.append(y)
 	#print 'listAns', listAns
 
 	decodeddata=[ [ix[n] for ix in listAns] for n in range(numAns) ]
 
 	return decodeddata
-
-from encoder import encode, SelfTest
 
 if __name__=='__main__':
 	# Encoded message got from network
@@ -56,7 +94,6 @@ if __name__=='__main__':
 	decodeddata=decode(listt)
 	decodeddatalist1, decodeddatalist2, decodeddatalist3=decodeddata
 
-	print ''
 	print 'Decoded data: '
 	print 'Data from source A'
 	# Data in decimal value
