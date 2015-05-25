@@ -67,8 +67,10 @@ def GaussEliminationXor(listOfVector):
 	return answer
 
 if code1==linearCode:
+	print 'NOTE: Using linear code'
 	decode1=GaussEliminationLinear
 else:
+	print 'NOTE: Using GF(2) code'
 	decode1=GaussEliminationXor
 
 # Decoding Part
