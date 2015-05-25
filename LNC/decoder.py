@@ -1,5 +1,5 @@
 import numpy
-from encoder import encode, code1, linearCode, xorCode, SelfTest
+from encoder import encode, fullencode, code1, linearCode, xorCode, SelfTest
 
 DEBUG=False
 
@@ -88,6 +88,9 @@ def decode(encoded):
 
 	return decodeddata
 
+def fullreconstruct(coeffs, encoded):
+	pass
+	
 if __name__=='__main__':
 	# Encoded message got from network
 	encodedstringreceived = SelfTest.gold

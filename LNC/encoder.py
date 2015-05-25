@@ -54,8 +54,6 @@ else:
 
 def encode1(x, y, z, coeffs):
 	li = code1(x, y, z, coeffs)
-	#for a in li: 
-	#	print a
 	listOfEqns = split(4, li)
 	return listOfEqns
 
@@ -65,6 +63,8 @@ def split(n, iter, fill=None):
 
 def ListOfCharToListOfInt(alist):
 	return [ord(x) for x in alist]
+
+from pprint import pprint
 
 def encode(a, b, c, coeffs):
 	# Packets whose values are conveted into the decimal values
@@ -78,7 +78,13 @@ def encode(a, b, c, coeffs):
 	# Perform an encoding operation using Random Linear Coding
 	encodedlist = [encode1(data[0], data[1], data[2], coeffs) for data in zip(p, q, r)]
 
+	pprint(encodedlist)
+	
 	return encodedlist
+
+def fullencode(a, b, c, coeffs):
+	enc=encode(a, b, c, coeffs)
+	return coeffs, [ [x[-1] for x in y] for y in enc ]
 
 class SelfTest:
 	# Initial data from the three different source nodes
@@ -103,3 +109,5 @@ if __name__=='__main__':
 
 	print encoded_mess==SelfTest.gold
 	print encodedlist==eval(SelfTest.gold)
+
+	pprint(fullencode(SelfTest.a, SelfTest.b, SelfTest.c, COEFFS))
